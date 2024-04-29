@@ -48,15 +48,15 @@ brews:
   - name: catalystgo
     repository:
       owner: catalystgo
-      name: homebrew-lordvidex
+      name: homebrew-catalystgo
     commit_author:
       name: Ahmad Helaly
-      email: evans.dev99@gmail.com
+      email: ahmad.helaly.dev@gmail.com
     homepage: https://github.com/catalystgo/cli
     description: Catalystgo CLI tool for code generation
     license: "MIT"
     caveats: |
-      Thanks for installing gomeasure!
+      Thanks for installing catalystgo-cli!
       Please consider starring the project at https://github.com/catalystgo/cli
 
 changelog:
