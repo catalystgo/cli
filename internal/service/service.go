@@ -11,13 +11,13 @@ import (
 var _ Service = service{}
 
 type Service interface {
-	Init(module string, components []component.Component, override bool)
+	Init(components []component.Component, override bool)
 }
 
 type service struct{}
 
 // Init implements CommandService.
-func (c service) Init(module string, components []component.Component, override bool) {
+func (c service) Init(components []component.Component, override bool) {
 	for _, c := range components {
 		name := filepath.Join(c.Path(), c.Name())
 

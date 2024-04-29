@@ -29,8 +29,11 @@ var initCmd = &cobra.Command{
 
 			// Go
 			component.NewGomodComponent(module, strings.TrimPrefix(runtime.Version(), "go")),
+
+			// Buf
 			component.NewBufComponent(),
 			component.NewBufGenComponent(module),
+			component.NewBufWorkComponent(),
 
 			// Docker
 			component.NewDockerComponent(module),
@@ -47,7 +50,7 @@ var initCmd = &cobra.Command{
 			component.NewTaskfileComponent(module),
 		}
 
-		srv.Init(module, components, override)
+		srv.Init(components, override)
 		return nil
 	},
 }
