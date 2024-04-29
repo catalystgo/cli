@@ -21,28 +21,33 @@ managed:
     default: {{.Module}}
 
 plugins:
-  - path: bin/protoc-gen-go
+  - name: go
+    path: bin/protoc-gen-go
     out: pkg
     opt: paths=source_relative
 
-  - path: bin/protoc-gen-go-grpc
+  - name: go-grpc
+    path: bin/protoc-gen-go-grpc
     out: pkg
     opt:
       - paths=source_relative
 
-  - path: bin/protoc-gen-grpc-gateway
+  - name: grpc-gateway
+    path: bin/protoc-gen-grpc-gateway
     out: pkg
     opt:
       - paths=source_relative
       - generate_unbound_methods=true
 
-  - path: bin/protoc-gen-vtproto
+  - name: vtproto
+    path: bin/protoc-gen-vtproto
     out: pkg
     opt:
       - paths=source_relative
       - features=marshal+unmarshal+size
 
-  - path: bin/protoc-gen-openapiv2
+  - name: openapiv2
+    path: bin/protoc-gen-openapiv2
     out: pkg
 `)
 
@@ -75,7 +80,7 @@ func (f bufGenComponent) Content() ([]byte, error) {
 
 // Name implements Component.
 func (f bufGenComponent) Name() string {
-	return "buf.gen.yml"
+	return "buf.gen.yaml"
 }
 
 // Path implements Component.

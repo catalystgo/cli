@@ -22,7 +22,7 @@ lint:
 
 // Name implements Component.
 func (f bufComponent) Name() string {
-	return "buf.yml"
+	return "buf.yaml"
 }
 
 // Path implements Component.
