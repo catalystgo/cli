@@ -7,7 +7,7 @@ vars:
 tasks:
   build:
     cmds:
-      - go build -o bin/catalystgo cmd/main.go
+      - go build -o bin/catalystgo cmd/catalystgo/main.go
 
   release:
     cmds:

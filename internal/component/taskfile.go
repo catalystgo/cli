@@ -27,11 +27,18 @@ vars:
 tasks:
   run:
     cmds:
-      - go run ./cmd/.
+      - |
+        export GOLANG_PROTOBUF_REGISTRATION_CONFLICT=warn
+        go run ./cmd/.
 
   mock:
     cmds:
       - echo "mocking!"
+
+  generate:
+    cmds:
+      - "{{.GOBIN}}/buf generate"
+      - go mod tidy
 
   format:
     cmds:

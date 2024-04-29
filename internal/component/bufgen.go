@@ -18,7 +18,7 @@ func init() {
 managed:
   enabled: true
   go_package_prefix:
-    default: {{.Module}}
+    default: {{.Module}}/pkg
 
 plugins:
   - name: go
@@ -40,7 +40,7 @@ plugins:
       - generate_unbound_methods=true
 
   - name: vtproto
-    path: bin/protoc-gen-vtproto
+    path: bin/protoc-gen-go-vtproto
     out: pkg
     opt:
       - paths=source_relative
