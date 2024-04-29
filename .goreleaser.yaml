@@ -16,7 +16,7 @@ before:
     - go generate ./...
 
 builds:
-  - main: ./cmd/main.go
+  - main: ./cmd/catalystgo/main.go
     id: "catalystgo"
     binary: catalystgo
     env:
