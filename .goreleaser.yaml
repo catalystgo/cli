@@ -46,7 +46,7 @@ archives:
 
 brews:
   - name: catalystgo
-    tap:
+    repository:
       owner: catalystgo
       name: homebrew-lordvidex
     commit_author:
