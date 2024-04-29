@@ -21,28 +21,28 @@ managed:
     default: {{.Module}}
 
 plugins:
-  - plugin: go
+  - path: bin/protoc-gen-go
     out: pkg
     opt: paths=source_relative
 
-  - plugin: go-grpc
+  - path: bin/protoc-gen-go-grpc
     out: pkg
     opt:
       - paths=source_relative
 
-  - plugin: grpc-gateway
+  - path: bin/protoc-gen-grpc-gateway
     out: pkg
     opt:
       - paths=source_relative
       - generate_unbound_methods=true
 
-  - plugin: vtproto
+  - path: bin/protoc-gen-vtproto
     out: pkg
     opt:
       - paths=source_relative
       - features=marshal+unmarshal+size
 
-  - plugin: openapiv2
+  - path: bin/protoc-gen-openapiv2
     out: pkg
 `)
 
