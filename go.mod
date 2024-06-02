@@ -5,6 +5,7 @@ go 1.22.0
 require (
 	github.com/fatih/color v1.16.0
 	github.com/spf13/cobra v1.8.0
+	google.golang.org/protobuf v1.34.1
 )
 
 require (

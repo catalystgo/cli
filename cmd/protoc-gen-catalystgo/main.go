@@ -32,12 +32,12 @@ func generateFile(gen *protogen.Plugin, file *protogen.File) {
 
 	// add imports
 	g.P("import (")
+	g.P(" _ \"embed\"")
 	g.P("	context \"context\"")
+	g.P()
 	g.P("	go_grpc_middleware \"github.com/grpc-ecosystem/go-grpc-middleware\"")
 	g.P("	\"github.com/grpc-ecosystem/grpc-gateway/v2/runtime\"")
 	g.P("	\"google.golang.org/grpc\"")
-	g.P()
-	g.P(" _ \"embed\"")
 	g.P(")")
 	g.P()
 
