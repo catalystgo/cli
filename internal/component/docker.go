@@ -2,56 +2,40 @@ package component
 
 import (
 	"bytes"
+	_ "embed"
 	"text/template"
 )
 
-var _ Component = dockerComponent{}
+var (
+	//go:embed template/docker/Dockerfile
+	dockerfileContent []byte
 
-var dockerComponentTemplate *template.Template
-
-func init() {
-	var err error
-
-	dockerComponentTemplate, err = template.New("docker-compose").Parse(
-		`FROM golang:1.22 AS development
-WORKDIR /go/src/{{.Module}}
-COPY . .
-RUN go mod download
-RUN go install github.com/cespare/reflex@latest
-CMD reflex -sr '\.go$' go run ./cmd/.
-
-FROM golang:alpine AS builder
-WORKDIR /go/src/{{.Module}}
-COPY . .
-RUN go build -o /go/bin/{{.AppName}} ./cmd/.
-
-FROM alpine:3.19 AS production
-COPY --from=builder /go/bin/{{.AppName}} /go/bin/{{.AppName}}
-# COPY ./{{.AppName}}/migrations /migrations
-COPY ./{{.AppName}}/config.yml /{{.AppName}}/config.yml
-ENTRYPOINT ["/go/bin/{{.AppName}}"]
-`)
-
-	if err != nil {
-		panic(err)
-	}
-}
-
-type (
-	dockerComponent struct {
-		AppName string
-		Module  string
-	}
+	//go:embed template/docker/docker-compose.txt
+	dockerComposeContent []byte
 )
 
-// Content implements Component.
-func (d dockerComponent) Content() ([]byte, error) {
-	var (
-		b   bytes.Buffer
-		err error
-	)
+var (
+	dockerTemplate        template.Template
+	dockerComposeTemplate template.Template
+)
 
-	err = dockerComponentTemplate.Execute(&b, d)
+//////////////////
+// DOCKER COMPONENT
+//////////////////
+
+type dockerComponent struct {
+	AppName string
+}
+
+func NewDockerComponent(module string) Component {
+	return dockerComponent{
+		AppName: getAppNameFromModule(module)}
+}
+
+func (d dockerComponent) Content() ([]byte, error) {
+	var b bytes.Buffer
+
+	err := dockerTemplate.Execute(&b, d)
 	if err != nil {
 		return nil, err
 	}
@@ -69,8 +53,34 @@ func (d dockerComponent) Path() string {
 	return ".deployment"
 }
 
-func NewDockerComponent(module string) Component {
-	return dockerComponent{
-		Module:  module,
+//////////////////
+// DOCKER COMPOSE COMPONENT
+//////////////////
+
+type dockerComposeComponent struct {
+	AppName string
+}
+
+func NewDockerComposeComponent(module string) Component {
+	return dockerComposeComponent{
 		AppName: getAppNameFromModule(module)}
+}
+
+func (d dockerComposeComponent) Content() ([]byte, error) {
+	var b bytes.Buffer
+
+	err := dockerComposeTemplate.Execute(&b, d)
+	if err != nil {
+		return nil, err
+	}
+
+	return b.Bytes(), nil
+}
+
+func (d dockerComposeComponent) Name() string {
+	return "docker-compose.yml"
+}
+
+func (d dockerComposeComponent) Path() string {
+	return ".deployment"
 }

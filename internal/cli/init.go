@@ -29,11 +29,12 @@ var initCmd = &cobra.Command{
 
 			// Go
 			component.NewGomodComponent(module, strings.TrimPrefix(runtime.Version(), "go")),
+			component.NewGitignoreComponent(),
 
 			// Buf
 			component.NewBufComponent(),
-			component.NewBufGenComponent(module),
-			component.NewBufWorkComponent(),
+			component.NewBufGenComponent(),
+			component.NewBufGenVendorComponent(),
 
 			// Docker
 			component.NewDockerComponent(module),

@@ -1,15 +1,4 @@
-package component
-
-var _ Component = preCommitComponent{}
-
-type (
-	preCommitComponent struct{}
-)
-
-// Content implements Component.
-func (p preCommitComponent) Content() ([]byte, error) {
-	return []byte(
-		`repos:
+repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
     hooks:
@@ -44,19 +33,3 @@ func (p preCommitComponent) Content() ([]byte, error) {
       - id: commitlint # avaliable types are: build, ci, chore, docs, feat, fix, perf, refactor, revert, style, test
         stages: [push, commit]
         additional_dependencies: ["@commitlint/config-conventional"]
-`), nil
-}
-
-// Name implements Component.
-func (p preCommitComponent) Name() string {
-	return ".pre-commit-config.yml"
-}
-
-// Path implements Component.
-func (p preCommitComponent) Path() string {
-	return "."
-}
-
-func NewPreCommitComponent() Component {
-	return preCommitComponent{}
-}

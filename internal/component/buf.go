@@ -1,35 +1,82 @@
 package component
 
-var _ Component = bufComponent{}
-
-type (
-	bufComponent struct{}
+import (
+	_ "embed"
 )
 
-// Content implements Component.
-func (f bufComponent) Content() ([]byte, error) {
-	return []byte(`version: v1
+var (
+	//go:embed template/buf/buf.yaml
+	bufContent []byte
 
-lint:
-    use:
-        - DEFAULT
-    rpc_allow_same_request_response: false
-    rpc_allow_google_protobuf_empty_requests: true
-    rpc_allow_google_protobuf_empty_responses: true
-    allow_comment_ignores: true
-`), nil
+	//go:embed template/buf/buf.gen.yaml
+	bufGenContent []byte
+
+	//go:embed template/buf/buf.gen.vendor.yaml
+	bufGenVendorContent []byte
+)
+
+type (
+	bufComponent          struct{}
+	bufGenComponent       struct{}
+	bugGenVendorComponent struct{}
+)
+
+//////////////////
+// BUF COMPONENT
+//////////////////
+
+func NewBufComponent() Component {
+	return bufComponent{}
 }
 
-// Name implements Component.
+func (f bufComponent) Content() ([]byte, error) {
+	return bufContent, nil
+}
+
 func (f bufComponent) Name() string {
 	return "buf.yaml"
 }
 
-// Path implements Component.
 func (f bufComponent) Path() string {
 	return "."
 }
 
-func NewBufComponent() Component {
-	return bufComponent{}
+//////////////////
+// BUF GEN COMPONENT
+//////////////////
+
+func NewBufGenComponent() Component {
+	return bufGenComponent{}
+}
+
+func (f bufGenComponent) Content() ([]byte, error) {
+	return bufGenContent, nil
+}
+
+func (f bufGenComponent) Name() string {
+	return "buf.gen.yaml"
+}
+
+func (f bufGenComponent) Path() string {
+	return "."
+}
+
+//////////////////
+// BUF GEN VENDOR COMPONENT
+//////////////////
+
+func NewBufGenVendorComponent() Component {
+	return bugGenVendorComponent{}
+}
+
+func (f bugGenVendorComponent) Content() ([]byte, error) {
+	return bufGenVendorContent, nil
+}
+
+func (f bugGenVendorComponent) Name() string {
+	return "buf.gen.vendor.yaml"
+}
+
+func (f bugGenVendorComponent) Path() string {
+	return "."
 }
