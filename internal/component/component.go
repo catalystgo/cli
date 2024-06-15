@@ -3,6 +3,7 @@ package component
 import (
 	"bytes"
 	"path/filepath"
+	"strings"
 	"text/template"
 
 	"github.com/catalystgo/cli/internal/log"
@@ -25,6 +26,10 @@ type Component interface {
 
 func getAppNameFromModule(module string) string {
 	return filepath.Base(module)
+}
+
+func getUserFromModule(module string) string {
+	return strings.Split(module, "/")[1]
 }
 
 func loadTemplate(name string, content []byte, t *template.Template) {

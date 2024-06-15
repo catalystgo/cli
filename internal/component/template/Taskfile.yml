@@ -8,17 +8,49 @@ vars:
   DB_DSN: "user=postgres dbname={{.AppName}} password=postgres sslmode=disable"
   MIGRATION_DIR: "./migrations"
 
+  # DOCKER
+  DOCKER_IMAGE: "{{.Username}}/{{.AppName}}"
+
 tasks:
   run:
     cmds:
-      - |
-        export GOLANG_PROTOBUF_REGISTRATION_CONFLICT=warn
-        go run ./cmd/.
+      - go run ./cmd/{{.AppName}}/.
 
   mock:
     cmds:
       - echo "mocking!"
-      # - mockgen -source=./internal/mock/mock.go -destination=./internal/mock/mock.go -package=mock
+      # - {{.GOBIN}}/mockgen -source=./internal/mock/mock.go -destination=./internal/mock/mock.go -package=mock
+
+  format:
+    cmds:
+      - task: go_files
+        vars: { COMMAND: "gofmt -w  {} +"}
+      - task: go_files
+        vars: { COMMAND: "{{.GOBIN}}/goimports -w  {} +"}
+
+  test:
+    cmds:
+      - go test -v -cover -json -coverprofile=coverage.out
+        $(go list ./... | grep -Ewv "(mock$|cmd$)") | {{.GOBIN}}/gotestfmt
+
+  lint:
+    cmds:
+      - "{{.GOBIN}}/revive
+        -config revive.toml
+        -formatter friendly
+        -exclude ./mock
+        -exclude ./internal/pb
+        -exclude vendor.proto
+        ./..."
+
+  pre-commit:
+    desc: "Run all pre-commit tasks"
+    cmds:
+      - task: format
+      - task: test
+      - task: lint
+
+# PROTO & DEPS
 
   generate:
     cmds:
@@ -30,25 +62,11 @@ tasks:
       - deps
       - vendor
 
-  format:
+  vendor:
     cmds:
-      - task: go_files
-        vars: { COMMAND: "gofmt -w  {} +"}
-      - task: go_files
-        vars: { COMMAND: "{{.GOBIN}}/goimports -w  {} +"}
-
-  test:
-    cmds:
-      - go test -v -race -cover ./...
-
-  lint:
-    cmds:
-      - "{{.GOBIN}}/revive
-        -config revive.toml
-        -formatter friendly
-        -exclude ./mock
-        -exclude ./internal/pb
-        ./..."
+      # Check if protosync.yaml exists if not call protosync init
+      - test -f protosync.yaml || "{{.GOBIN}}/protosync init"
+      - "{{.GOBIN}}/protosync vendor --file protosync.yaml"
 
   deps:
     cmds:
@@ -59,16 +77,21 @@ tasks:
       - GOBIN={{.GOBIN}} go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28.1
       - GOBIN={{.GOBIN}} go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2.0
       - GOBIN={{.GOBIN}} go install github.com/bufbuild/buf/cmd/buf@v1.31.0
-      - GOBIN={{.GOBIN}} go install github.com/catalystgo/cli/cmd/catalystgo@v0.0.3
+
+      # CATALYSTGO
+      - GOBIN={{.GOBIN}} go install github.com/catalystgo/cli/cmd/catalystgo@v0.0.4
+      - GOBIN={{.GOBIN}} go install github.com/catalystgo/cli/cmd/protoc-gen-catalystgo@v0.0.4
+      - GOBIN={{.GOBIN}} go install github.com/catalystgo/protosync@v0.0.1
 
       # TOOLS
       - GOBIN={{.GOBIN}} go install github.com/pressly/goose/v3/cmd/goose@v3.20.0
       - GOBIN={{.GOBIN}} go install golang.org/x/tools/cmd/goimports@v0.19.0
       - GOBIN={{.GOBIN}} go install github.com/mgechev/revive@v1.3.7
       - GOBIN={{.GOBIN}} go install github.com/google/yamlfmt/cmd/yamlfmt@v0.12.1
-      - pip install pre-commit
+      - GOBIN={{.GOBIN}} go install github.com/golang/mock/mockgen@v1.6.0
+      - GOBIN={{.GOBIN}} go install github.com/gotesttools/gotestfmt/v2/cmd/gotestfmt@v2.5.0
 
-## DOCKER
+# DOCKER COMPOSE
 
   docker-up:
     cmds:
@@ -77,6 +100,24 @@ tasks:
   docker-down:
     cmds:
       - docker compose down -f .deployment/docker-compose.yml
+
+# DOCKER
+
+  docker-build:
+    cmds:
+      - docker build -t {{.DOCKER_IMAGE}}:{{.VERSION}} .
+        --build-arg VERSION={{.VERSION}}
+        --build-arg BUILD_PATH=$(go list -m)/internal/build
+        --no-cache
+
+  docker-push:
+    cmds:
+      - docker push {{.DOCKER_IMAGE}}:{{.VERSION}}
+
+  docker-release:
+    cmds:
+      - task: docker-build
+      - task: docker-push
 
 # MIGRATIONS
 
@@ -96,7 +137,7 @@ tasks:
     cmds:
       - "{{.GOBIN}}/goose -dir {{.MIGRATION_DIR}} postgres \"{{.DB_DSN}}\" down"
 
-## INTERNAL COMMANDS
+# INTERNAL COMMANDS
 
   go_files:
     desc: "Return all .go files and run .COMMAND on them"

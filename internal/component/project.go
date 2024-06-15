@@ -107,19 +107,25 @@ func (d reviveComponent) Path() string {
 //////////////////
 
 type taskfileComponent struct {
-	AppName string
+	AppName  string
+	Username string
 }
 
 func NewTaskfileComponent(module string) Component {
 	return taskfileComponent{
-		AppName: getAppNameFromModule(module),
+		AppName:  getAppNameFromModule(module),
+		Username: getUserFromModule(module),
 	}
 }
 
 func (t taskfileComponent) Content() ([]byte, error) {
 	// Replace the placeholder with the app name, could be done with go-template
 	// because the Taskfile has templates inside.
-	return []byte(strings.ReplaceAll(string(taskfileContent), "{{.AppName}}", t.AppName)), nil
+	file := string(taskfileContent)
+	file = strings.ReplaceAll(file, "{{.AppName}}", t.AppName)
+	file = strings.ReplaceAll(file, "{{.Username}}", t.Username)
+
+	return []byte(file), nil
 }
 
 func (t taskfileComponent) Name() string {
@@ -166,12 +172,10 @@ func (c commitLintConfigComponent) Content() ([]byte, error) {
 	return commitLintConfig, nil
 }
 
-// Name implements Component.
 func (c commitLintConfigComponent) Name() string {
 	return "commitlint.config.js"
 }
 
-// Path implements Component.
 func (c commitLintConfigComponent) Path() string {
 	return "."
 }
