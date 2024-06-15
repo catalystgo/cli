@@ -14,13 +14,13 @@ var initCmd = &cobra.Command{
 	Short:   "Initialize a new project",
 	Long:    "Initialize a new project",
 	Example: "catalystgo init github.com/user_name/project_name",
-	Args: func(cmd *cobra.Command, args []string) error {
-		if len(args) != 1 {
-			return fmt.Errorf("expected one argument only (module)")
+	Args: func(_ *cobra.Command, args []string) error {
+		if len(args) == 1 {
+			return nil
 		}
-		return nil
+		return fmt.Errorf("expected one argument only (module)")
 	},
-	RunE: func(cmd *cobra.Command, args []string) error {
+	RunE: func(_ *cobra.Command, args []string) error {
 		module := args[0]
 
 		components := []component.Component{
