@@ -15,7 +15,7 @@ var (
 )
 
 func init() {
-	rootCmd.PersistentFlags().BoolVarP(&override, "override", "o", false, "override existing files")
+	rootCmd.PersistentFlags().BoolVarP(&override, "override", "r", false, "override existing files")
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "verbose logging")
 	rootCmd.AddCommand(initCmd)
 }

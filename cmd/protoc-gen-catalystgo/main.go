@@ -104,6 +104,11 @@ func generateFile(gen *protogen.Plugin, file *protogen.File) {
 		g.P()
 
 		for _, m := range s.Methods {
+			// TODO: research if streaming is supported in grpc-gateway (probably not)
+			if m.Desc.IsStreamingClient() || m.Desc.IsStreamingServer() {
+				continue
+			}
+
 			g.P("func (p *proxy", s.GoName, "Server) ", m.GoName, "(ctx context.Context, req *", m.Input.GoIdent, ") (*", m.Output.GoIdent, ", error) {")
 			g.P("	info := &grpc.UnaryServerInfo{")
 			g.P("		Server: p.", s.GoName, "Server,")
