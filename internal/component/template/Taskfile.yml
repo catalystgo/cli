@@ -18,8 +18,7 @@ tasks:
 
   mock:
     cmds:
-      - echo "mocking!"
-      # - {{.GOBIN}}/mockgen -source=./internal/mock/mock.go -destination=./internal/mock/mock.go -package=mock
+      - "{{.GOBIN}}/mockgen -source=./internal/mock/mock.go -destination=./internal/mock/mock.go -package=mock"
 
   format:
     cmds:
@@ -57,16 +56,18 @@ tasks:
       # Generate
       - "{{.GOBIN}}/buf generate --template buf.gen.vendor.yaml"
       - "{{.GOBIN}}/buf generate --template buf.gen.yaml"
+      - "{{.GOBIN}}/catalsytgo implement --input pkg --output internal/api"
       - go mod tidy
     deps:
-      - deps
       - vendor
 
   vendor:
     cmds:
-      # Check if protosync.yaml exists if not call protosync init
-      - test -f protosync.yaml || "{{.GOBIN}}/protosync init"
-      - "{{.GOBIN}}/protosync vendor --file protosync.yaml"
+      # Check if protosync.yml exists if not call protosync init
+      - if [ ! -f protosync.yml ]; then {{.GOBIN}}/protosync init; fi
+      - "{{.GOBIN}}/protosync vendor --file protosync.yml"
+    deps:
+      - deps
 
   deps:
     cmds:
@@ -76,7 +77,7 @@ tasks:
       - GOBIN={{.GOBIN}} go install github.com/planetscale/vtprotobuf/cmd/protoc-gen-go-vtproto@v0.6.0
       - GOBIN={{.GOBIN}} go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28.1
       - GOBIN={{.GOBIN}} go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2.0
-      - GOBIN={{.GOBIN}} go install github.com/bufbuild/buf/cmd/buf@v1.31.0
+      - GOBIN={{.GOBIN}} go install github.com/bufbuild/buf/cmd/buf@v1.33.0
 
       # CATALYSTGO
       - GOBIN={{.GOBIN}} go install github.com/catalystgo/cli/cmd/catalystgo@v0.0.4

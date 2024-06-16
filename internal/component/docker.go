@@ -24,11 +24,13 @@ var (
 //////////////////
 
 type dockerComponent struct {
+	Module  string
 	AppName string
 }
 
 func NewDockerComponent(module string) Component {
 	return dockerComponent{
+		Module:  module,
 		AppName: getAppNameFromModule(module)}
 }
 
