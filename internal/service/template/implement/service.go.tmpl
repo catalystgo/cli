@@ -1,0 +1,18 @@
+package {{.PackageName}}
+
+import (
+  "github.com/catalystgo/catalystgo"
+  desc "{{.ProtoImportPath}}"
+)
+
+type {{.ServiceStructName}} struct {
+  desc.Unimplemented{{.ServiceName}}Server
+}
+
+func New{{.ServiceName}}() *{{.ServiceStructName}} {
+  return &{{.ServiceStructName}}{}
+}
+
+func (i *{{.ServiceStructName}}) GetDescription() catalystgo.ServiceDesc {
+  return desc.New{{.ServiceName}}ServiceDesc(i)
+}

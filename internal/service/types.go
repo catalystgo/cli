@@ -1,6 +1,8 @@
 package service
 
-import "go/ast"
+import (
+	"go/ast"
+)
 
 const (
 	gprcFileSuffix = "_grpc.pb.go"

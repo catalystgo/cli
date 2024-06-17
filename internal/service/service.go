@@ -3,12 +3,13 @@ package service
 import (
 	"fmt"
 	"go/ast"
+	"html/template"
 	"path"
 	"path/filepath"
 	"strings"
 
 	"github.com/catalystgo/cli/internal/component"
-	"github.com/catalystgo/cli/internal/log"
+	"github.com/catalystgo/logger/log"
 )
 
 var _ Service = &service{}
@@ -131,7 +132,12 @@ func (s *service) implement(nodes map[string]*ast.File, input string, output str
 
 		// Build the service.go file
 		serviceFile := path.Join(fileDir, "service.go")
-		serviceContent := s.buildContructor(module, file, packageName, serviceName)
+		serviceContent, err := s.buildContructor(module, file, packageName, serviceName)
+		if err != nil {
+			log.Errorf("build service (%s) => %v", serviceName, err)
+			continue
+		}
+
 		files[serviceFile] = serviceContent
 
 		// Build the method files
@@ -148,7 +154,12 @@ func (s *service) implement(nodes map[string]*ast.File, input string, output str
 			// 	methodName  = MethodName
 			// 	methodFile  = /path/to/output/level_one/level_two/method_name.go
 			methodFile := path.Join(fileDir, fmt.Sprintf("%s.go", toSnakeCase(method.Name.Name)))
-			methodContent := s.buildStructMethod(module, file, packageName, method)
+			methodContent, err := s.buildStructMethod(module, file, packageName, method)
+			if err != nil {
+				log.Errorf("build method (%s) => %v", method.Name.Name, err)
+				continue
+			}
+
 			files[methodFile] = methodContent
 		}
 	}
@@ -156,127 +167,62 @@ func (s *service) implement(nodes map[string]*ast.File, input string, output str
 	return files, nil
 }
 
-func (s *service) buildContructor(module string, file string, packageName string, serviceName string) []byte {
+func (s *service) buildContructor(module string, file string, packageName string, serviceName string) ([]byte, error) {
 	b := strings.Builder{}
 
 	// Get the service name without the unimplemented prefix and suffix
 	serviceName = strings.TrimSuffix(serviceName, unimplementedStructSuffix)
 	serviceName = strings.TrimPrefix(serviceName, unimplementedStructPrefix)
 
-	// Write package and imports
-	b.WriteString(fmt.Sprintf("package %s", packageName))
-	b.WriteString("\n\n")
-	b.WriteString("import (")
-	b.WriteString("\n")
-	b.WriteString(fmt.Sprintf("\t%q", "github.com/catalystgo/catalystgo"))
-	b.WriteString("\n")
-	b.WriteString(fmt.Sprintf("\tdesc %q", path.Dir(path.Join(module, file))))
-	b.WriteString("\n")
-	b.WriteString(")")
-	b.WriteString("\n\n")
+	err := serviceTemplate.Execute(&b, serviceTemplateData{
+		PackageName:       packageName,
+		ProtoImportPath:   path.Dir(path.Join(module, file)),
+		ServiceStructName: implementationStructName,
+		ServiceName:       serviceName,
+	})
+	if err != nil {
+		return nil, err
+	}
 
-	// Write struct object
-	b.WriteString(fmt.Sprintf("type %s struct {", implementationStructName))
-	b.WriteString("\n")
-	b.WriteString(fmt.Sprintf("\tdesc.Unimplemented%sServer", serviceName))
-	b.WriteString("\n")
-	b.WriteString("}")
-	b.WriteString("\n\n")
-
-	// Write constructor method
-	b.WriteString(fmt.Sprintf("func New%s() *%s {", serviceName, implementationStructName))
-	b.WriteString("\n")
-	b.WriteString(fmt.Sprintf("\treturn &%s{}", implementationStructName))
-	b.WriteString("\n")
-	b.WriteString("}")
-	b.WriteString("\n\n")
-
-	// Write GetDescription method
-	b.WriteString(fmt.Sprintf("func (i *%s) GetDescription() catalystgo.ServiceDesc {", implementationStructName))
-	b.WriteString("\n")
-	b.WriteString(fmt.Sprintf("\treturn desc.New%sServiceDesc(i)", serviceName))
-	b.WriteString("\n")
-	b.WriteString("}")
-	b.WriteString("\n\n")
-
-	return []byte(b.String())
+	return []byte(b.String()), nil
 }
 
-func (s *service) buildStructMethod(module string, file string, packageName string, method *ast.FuncDecl) []byte {
-	b := &strings.Builder{}
+func (s *service) buildStructMethod(module string, file string, packageName string, method *ast.FuncDecl) ([]byte, error) {
+	var (
+		b    = &strings.Builder{}
+		tmpl *template.Template
+
+		data = methodTemplateData{
+			PackageName:       packageName,
+			ProtoImportPath:   path.Dir(path.Join(module, file)),
+			ServiceStructName: implementationStructName,
+			MethodName:        method.Name.Name,
+		}
+	)
 
 	// Get the method type
 	methodType := getMethodType(method)
-	if methodType == unknownMethod {
-		log.Warnf("unsupported method type for method %q", method.Name.Name)
-		return nil
-	}
-
-	// Write package and imports
-	b.WriteString(fmt.Sprintf("package %s", packageName))
-	b.WriteString("\n\n")
-	b.WriteString("import (")
-	b.WriteString("\n")
-
-	// Only unary methods require context import
-	if methodType == unaryMethod {
-		b.WriteString(fmt.Sprintf("\t%q", "context"))
-		b.WriteString("\n\n")
-	}
-
-	b.WriteString(fmt.Sprintf("\tdesc %q", path.Dir(path.Join(module, file))))
-	b.WriteString("\n")
-	b.WriteString(fmt.Sprintf("\t%q", "google.golang.org/grpc/codes"))
-	b.WriteString("\n")
-	b.WriteString(fmt.Sprintf("\t%q", "google.golang.org/grpc/status"))
-	b.WriteString("\n")
-	b.WriteString(")\n\n")
-
-	// Write method signature
-	s.buildStructMethodSignature(b, method, methodType)
-
-	return []byte(b.String())
-}
-
-// buildStructMethodSignature writes the method signature to the string builder
-// Output example:
-// Unary RPC									: func (i *Implementation) MethodName(ctx context.Context, req *Request) (*Response, error) {
-// Server Streaming RPC				: func (i *Implementation) MethodName(req *Request, stream desc.ServiceName_MethodNameServer) error {
-// Client Streaming RPC				: func (i *Implementation) MethodName(stream desc.ServiceName_MethodNameServer) error {
-// Bidirectional Streaming RPC: func (i *Implementation) MethodName(stream desc.ServiceName_MethodNameServer) error {
-func (s *service) buildStructMethodSignature(b *strings.Builder, method *ast.FuncDecl, methodType methodType) {
-	b.WriteString(fmt.Sprintf("func (i *%s) %s(", implementationStructName, method.Name.Name))
-
 	switch methodType {
-	// Unary RPC
 	case unaryMethod:
-		b.WriteString(fmt.Sprintf("ctx context.Context, req *desc.%s) (*desc.%s, error) {",
-			method.Type.Params.List[1].Type.(*ast.StarExpr).X.(*ast.Ident).Name,  // request
-			method.Type.Results.List[0].Type.(*ast.StarExpr).X.(*ast.Ident).Name, // response
-		))
-		// Write the body
-		b.WriteString(fmt.Sprintf("\n\treturn nil, status.Error(codes.Unimplemented, `method %q not implemented`)", method.Name.Name))
-
-	// Server Streaming RPC
+		tmpl = methodUnaryTemplate
+		data.Request = method.Type.Params.List[1].Type.(*ast.StarExpr).X.(*ast.Ident).Name   // request
+		data.Response = method.Type.Results.List[0].Type.(*ast.StarExpr).X.(*ast.Ident).Name // response
 	case serverStreamMethod:
-		b.WriteString(fmt.Sprintf("req *desc.%s, stream desc.%s) error {",
-			method.Type.Params.List[0].Type.(*ast.StarExpr).X.(*ast.Ident).Name, // request
-			method.Type.Params.List[1].Type.(*ast.Ident).Name,                   // stream
-		))
-		// Write the body
-		b.WriteString(fmt.Sprintf("\n\treturn status.Error(codes.Unimplemented, `method %q not implemented`)", method.Name.Name))
-
-	// Bidirectional or Client Streaming RPC (same signature)
+		tmpl = methodServerStreamTemplate
+		data.Request = method.Type.Params.List[0].Type.(*ast.StarExpr).X.(*ast.Ident).Name // request
+		data.Stream = method.Type.Params.List[1].Type.(*ast.Ident).Name                    // stream
 	case bidectionalOrClientStreamMethod:
-		b.WriteString(fmt.Sprintf("stream desc.%s) error {",
-			method.Type.Params.List[0].Type.(*ast.Ident).Name, // stream
-		))
-		// Write the body
-		b.WriteString(fmt.Sprintf("\n\treturn status.Error(codes.Unimplemented, `method %q not implemented`)", method.Name.Name))
-
+		tmpl = methodBidectionalOrClientTemplate
+		data.Stream = method.Type.Params.List[0].Type.(*ast.Ident).Name // stream
 	default:
-		log.Warnf("unsupported method signature ()=> %s", method.Name.Name)
+		log.Warnf("unsupported method type (%s) in file (%s)", methodType, file)
+		return nil, nil
 	}
 
-	b.WriteString("\n}\n")
+	err := tmpl.Execute(b, data)
+	if err != nil {
+		return nil, err
+	}
+
+	return []byte(b.String()), nil
 }

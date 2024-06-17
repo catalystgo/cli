@@ -4,7 +4,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/catalystgo/cli/internal/log"
+	"github.com/catalystgo/logger/log"
 )
 
 type WriteOpt struct {

@@ -3,8 +3,8 @@ package cli
 import (
 	"context"
 
-	"github.com/catalystgo/cli/internal/log"
 	"github.com/catalystgo/cli/internal/service"
+	"github.com/catalystgo/logger/log"
 	"github.com/spf13/cobra"
 )
 
@@ -26,7 +26,9 @@ var rootCmd = &cobra.Command{
 	Use:   "catalystgo [command]",
 	Short: "Catalystgo framework CLI tool for code generation",
 	PersistentPreRun: func(_ *cobra.Command, _ []string) {
-		log.SetVerbose(verbose)
+		if verbose {
+			log.SetLevel(log.LevelDebug)
+		}
 	},
 }
 

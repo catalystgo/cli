@@ -1,0 +1,13 @@
+package {{.PackageName}}
+
+import (
+  "context"
+
+  desc "{{.ProtoImportPath}}"
+  "google.golang.org/grpc/codes"
+  "google.golang.org/grpc/status"
+)
+
+func (i *{{.ServiceStructName}}) {{.MethodName}}(ctx context.Context, req *desc.{{.Request}}) (*desc.{{.Response}}, error) {
+  return nil, status.Errorf(codes.Unimplemented, `method "{{.MethodName}}" not implemented`)
+}

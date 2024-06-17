@@ -6,7 +6,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/catalystgo/cli/internal/log"
+	"github.com/catalystgo/logger/log"
 )
 
 func init() {
@@ -32,6 +32,7 @@ func getUserFromModule(module string) string {
 	return strings.Split(module, "/")[1]
 }
 
+// TODO: Use domain.ParseTemplate instead of loadTemplate
 func loadTemplate(name string, content []byte, t *template.Template) {
 	gotT, err := template.New(name).Parse(string(content))
 	if err != nil {

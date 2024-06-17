@@ -11,7 +11,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/catalystgo/cli/internal/log"
+	"github.com/catalystgo/logger/log"
 	"golang.org/x/mod/modfile"
 )
 
