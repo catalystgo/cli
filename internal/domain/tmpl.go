@@ -1,7 +1,8 @@
 package domain
 
 import (
-	"html/template"
+	"bytes"
+	"text/template"
 
 	"github.com/catalystgo/logger/log"
 )
@@ -10,7 +11,6 @@ import (
 func ParseTemplate(name string, content []byte) (*template.Template, error) {
 	tmpl, err := template.New(name).Parse(string(content))
 	if err != nil {
-		log.Debugf("parse template %s: %v", name, err)
 		return nil, err
 	}
 	return tmpl, nil
@@ -23,4 +23,14 @@ func MustParseTemplate(name string, content []byte) *template.Template {
 		log.Panicf("must parse template %s: %v", name, err)
 	}
 	return tmpl
+}
+
+// ExecuteTemplate executes a template with given data and returns an error if one occurs.
+func ExecuteTemplate(t *template.Template, data interface{}) ([]byte, error) {
+	var b bytes.Buffer
+	err := t.Execute(&b, data)
+	if err != nil {
+		return nil, err
+	}
+	return b.Bytes(), nil
 }

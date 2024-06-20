@@ -6,6 +6,7 @@ type (
 	configComponent struct{}
 )
 
+// TODO: Update config struct & put it in a separate file as tmpl
 // Content implements Component.
 func (c configComponent) Content() ([]byte, error) {
 	return []byte(`

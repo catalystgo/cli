@@ -1,9 +1,9 @@
 package component
 
 import (
-	"bytes"
 	_ "embed"
-	"text/template"
+
+	"github.com/catalystgo/cli/internal/domain"
 )
 
 var (
@@ -15,8 +15,8 @@ var (
 )
 
 var (
-	dockerTemplate        template.Template
-	dockerComposeTemplate template.Template
+	dockerTemplate        = domain.MustParseTemplate("Dockerfile", dockerfileContent)
+	dockerComposeTemplate = domain.MustParseTemplate("docker-compose.yml", dockerComposeContent)
 )
 
 //////////////////
@@ -35,14 +35,7 @@ func NewDockerComponent(module string) Component {
 }
 
 func (d dockerComponent) Content() ([]byte, error) {
-	var b bytes.Buffer
-
-	err := dockerTemplate.Execute(&b, d)
-	if err != nil {
-		return nil, err
-	}
-
-	return b.Bytes(), nil
+	return domain.ExecuteTemplate(dockerTemplate, d)
 }
 
 // Name implements Component.
@@ -69,14 +62,7 @@ func NewDockerComposeComponent(module string) Component {
 }
 
 func (d dockerComposeComponent) Content() ([]byte, error) {
-	var b bytes.Buffer
-
-	err := dockerComposeTemplate.Execute(&b, d)
-	if err != nil {
-		return nil, err
-	}
-
-	return b.Bytes(), nil
+	return domain.ExecuteTemplate(dockerComposeTemplate, d)
 }
 
 func (d dockerComposeComponent) Name() string {

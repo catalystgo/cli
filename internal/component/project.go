@@ -3,7 +3,8 @@ package component
 import (
 	_ "embed"
 	"strings"
-	"text/template"
+
+	"github.com/catalystgo/cli/internal/domain"
 )
 
 var (
@@ -27,7 +28,7 @@ var (
 )
 
 var (
-	gomodTemplate template.Template
+	gomodTemplate = domain.MustParseTemplate("go.mod", gomodContent)
 )
 
 //////////////////
@@ -47,7 +48,7 @@ func NewGomodComponent(module string, version string) Component {
 }
 
 func (d gomodComponent) Content() ([]byte, error) {
-	return executeTemplate(&gomodTemplate, d)
+	return domain.ExecuteTemplate(gomodTemplate, d)
 }
 
 func (d gomodComponent) Name() string {

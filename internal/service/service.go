@@ -3,12 +3,13 @@ package service
 import (
 	"fmt"
 	"go/ast"
-	"html/template"
 	"path"
 	"path/filepath"
 	"strings"
+	"text/template"
 
 	"github.com/catalystgo/cli/internal/component"
+	"github.com/catalystgo/cli/internal/domain"
 	"github.com/catalystgo/logger/log"
 )
 
@@ -168,30 +169,23 @@ func (s *service) implement(nodes map[string]*ast.File, input string, output str
 }
 
 func (s *service) buildContructor(module string, file string, packageName string, serviceName string) ([]byte, error) {
-	b := strings.Builder{}
-
 	// Get the service name without the unimplemented prefix and suffix
 	serviceName = strings.TrimSuffix(serviceName, unimplementedStructSuffix)
 	serviceName = strings.TrimPrefix(serviceName, unimplementedStructPrefix)
 
-	err := serviceTemplate.Execute(&b, serviceTemplateData{
+	data := serviceTemplateData{
 		PackageName:       packageName,
 		ProtoImportPath:   path.Dir(path.Join(module, file)),
 		ServiceStructName: implementationStructName,
 		ServiceName:       serviceName,
-	})
-	if err != nil {
-		return nil, err
 	}
 
-	return []byte(b.String()), nil
+	return domain.ExecuteTemplate(serviceTemplate, data)
 }
 
 func (s *service) buildStructMethod(module string, file string, packageName string, method *ast.FuncDecl) ([]byte, error) {
 	var (
-		b    = &strings.Builder{}
 		tmpl *template.Template
-
 		data = methodTemplateData{
 			PackageName:       packageName,
 			ProtoImportPath:   path.Dir(path.Join(module, file)),
@@ -219,10 +213,5 @@ func (s *service) buildStructMethod(module string, file string, packageName stri
 		return nil, nil
 	}
 
-	err := tmpl.Execute(b, data)
-	if err != nil {
-		return nil, err
-	}
-
-	return []byte(b.String()), nil
+	return domain.ExecuteTemplate(tmpl, data)
 }

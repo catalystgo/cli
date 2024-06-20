@@ -1,22 +1,9 @@
 package component
 
 import (
-	"bytes"
 	"path/filepath"
 	"strings"
-	"text/template"
-
-	"github.com/catalystgo/logger/log"
 )
-
-func init() {
-	// Go
-	loadTemplate("go.mod", gomodContent, &gomodTemplate)
-
-	// Docker
-	loadTemplate("docker-compose.yml", dockerComposeContent, &dockerComposeTemplate)
-	loadTemplate("Dockerfile", dockerfileContent, &dockerTemplate)
-}
 
 type Component interface {
 	Name() string
@@ -30,23 +17,4 @@ func getAppNameFromModule(module string) string {
 
 func getUserFromModule(module string) string {
 	return strings.Split(module, "/")[1]
-}
-
-// TODO: Use domain.ParseTemplate instead of loadTemplate
-func loadTemplate(name string, content []byte, t *template.Template) {
-	gotT, err := template.New(name).Parse(string(content))
-	if err != nil {
-		log.Errorf("parse template %s: %v", name, err)
-		return
-	}
-	*t = *gotT
-}
-
-func executeTemplate(t *template.Template, data interface{}) ([]byte, error) {
-	var b bytes.Buffer
-	err := t.Execute(&b, data)
-	if err != nil {
-		return nil, err
-	}
-	return b.Bytes(), nil
 }
