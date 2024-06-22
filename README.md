@@ -1,5 +1,12 @@
 # cli
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/catalystgo/cli.svg)](https://pkg.go.dev/github.com/catalystgo/cli)
+[![Go Report Card](https://goreportcard.com/badge/github.com/catalystgo/cli)](https://goreportcard.com/report/github.com/catalystgo/cli)
+![License](https://img.shields.io/github/license/catalystgo/cli)
+
+![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/catalystgo/cli)
+![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/catalystgo/cli)
+
 ## Future milestones 💎
 
 ### Priority (high)
