@@ -80,8 +80,8 @@ tasks:
       - GOBIN={{.GOBIN}} go install github.com/bufbuild/buf/cmd/buf@v1.33.0
 
       # CATALYSTGO
-      - GOBIN={{.GOBIN}} go install github.com/catalystgo/cli/cmd/catalystgo@v0.0.4
-      - GOBIN={{.GOBIN}} go install github.com/catalystgo/cli/cmd/protoc-gen-catalystgo@v0.0.4
+      - GOBIN={{.GOBIN}} go install github.com/catalystgo/cli/cmd/catalystgo@v0.0.3
+      - GOBIN={{.GOBIN}} go install github.com/catalystgo/cli/cmd/protoc-gen-catalystgo@v0.0.3
       - GOBIN={{.GOBIN}} go install github.com/catalystgo/protosync@v0.0.1
 
       # TOOLS

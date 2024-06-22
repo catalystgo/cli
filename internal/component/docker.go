@@ -54,11 +54,14 @@ func (d dockerComponent) Path() string {
 
 type dockerComposeComponent struct {
 	AppName string
+	Module  string
 }
 
 func NewDockerComposeComponent(module string) Component {
 	return dockerComposeComponent{
-		AppName: getAppNameFromModule(module)}
+		AppName: getAppNameFromModule(module),
+		Module:  module,
+	}
 }
 
 func (d dockerComposeComponent) Content() ([]byte, error) {
