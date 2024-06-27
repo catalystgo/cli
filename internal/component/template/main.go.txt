@@ -12,7 +12,7 @@ func main() {
 
   app, err := catalystgo.New()
   if err != nil {
-    logger.Fatalf(ctx, "init application: %v", err)l
+    logger.Fatalf(ctx, "init application: %v", err)
   }
 
   if err := app.Run(); err != nil {

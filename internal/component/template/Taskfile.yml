@@ -56,7 +56,7 @@ tasks:
       # Generate
       - "{{.GOBIN}}/buf generate --template buf.gen.vendor.yaml"
       - "{{.GOBIN}}/buf generate --template buf.gen.yaml"
-      - "{{.GOBIN}}/catalsytgo implement --input pkg --output internal/api"
+      - "{{.GOBIN}}/catalystgo implement --input pkg --output internal/api"
       - go mod tidy
     deps:
       - vendor
