@@ -8,6 +8,9 @@ server:
     port: 7001
   grpc:
     port: 8001
+  graceful_shutdown:
+    timeout: 10s
+    delay: 1s
 
 tracing:
   enabled: true
