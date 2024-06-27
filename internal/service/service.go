@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 	"go/ast"
+	"os/exec"
 	"path"
 	"path/filepath"
 	"strings"
@@ -65,6 +66,12 @@ func (s *service) Init(components []component.Component, override bool) {
 		if err != nil {
 			continue
 		}
+	}
+
+	log.Info("running go mod tidy")
+	err := exec.Command("go", "mod", "tidy").Run()
+	if err != nil {
+		log.Errorf("go mod tidy => %v", err)
 	}
 }
 
