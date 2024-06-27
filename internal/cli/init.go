@@ -27,6 +27,7 @@ var initCmd = &cobra.Command{
 			// Go
 			component.NewGomodComponent(module, strings.TrimPrefix(runtime.Version(), "go")),
 			component.NewGitignoreComponent(),
+			component.NewGoMainComponent(module),
 
 			// Buf
 			component.NewBufComponent(),

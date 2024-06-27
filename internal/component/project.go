@@ -2,6 +2,7 @@ package component
 
 import (
 	_ "embed"
+	"fmt"
 	"strings"
 
 	"github.com/catalystgo/cli/internal/domain"
@@ -10,6 +11,9 @@ import (
 var (
 	//go:embed template/gomod.txt
 	gomodContent []byte
+
+	//go:embed template/main.go.txt
+	goMainContent []byte
 
 	//go:embed template/gitignore.txt
 	gitignoreContent []byte
@@ -179,4 +183,30 @@ func (c commitLintConfigComponent) Name() string {
 
 func (c commitLintConfigComponent) Path() string {
 	return "."
+}
+
+//////////////////
+// MAIN.GO COMPONENT
+//////////////////
+
+type goMainComponent struct {
+	AppName string
+}
+
+func NewGoMainComponent(module string) Component {
+	return goMainComponent{
+		AppName: getAppNameFromModule(module),
+	}
+}
+
+func (g goMainComponent) Content() ([]byte, error) {
+	return goMainContent, nil
+}
+
+func (g goMainComponent) Name() string {
+	return "main.go"
+}
+
+func (g goMainComponent) Path() string {
+	return fmt.Sprintf("./cmd/%s", g.AppName)
 }
