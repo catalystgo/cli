@@ -10,8 +10,14 @@ services:
       context: .
       dockerfile: ./development/Dockerfile
       target: development
+    ports:
+      - "8001:8001"
+      - "7001:7001"
+      - "6001:6001"
     depends_on:
       etcd:
+        condition: service_healthy
+      vault:
         condition: service_healthy
       postgres:
         condition: service_healthy

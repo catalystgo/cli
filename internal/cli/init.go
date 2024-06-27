@@ -24,9 +24,6 @@ var initCmd = &cobra.Command{
 		module := args[0]
 
 		components := []component.Component{
-			// Catalystgo config file
-			component.NewConfigComponent(),
-
 			// Go
 			component.NewGomodComponent(module, strings.TrimPrefix(runtime.Version(), "go")),
 			component.NewGitignoreComponent(),
@@ -50,6 +47,9 @@ var initCmd = &cobra.Command{
 			// Automation
 			component.NewTaskfileComponent(module),
 		}
+
+		// Config
+		components = append(components, component.NewConfigComponent(module)...)
 
 		srv.Init(components, override)
 		return nil

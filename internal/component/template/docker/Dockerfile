@@ -2,8 +2,7 @@ FROM golang:1.22 AS development
 WORKDIR /go/src/{{.Module}}
 COPY . .
 RUN go mod download
-RUN go install github.com/cespare/reflex@latest
-CMD reflex -sr '\.go$' go run ./cmd/.
+CMD go run ./cmd/{{.AppName}}/. --config ./.catalystgo/config-development.yml
 
 FROM golang:alpine AS builder
 WORKDIR /go/src/{{.Module}}
@@ -12,6 +11,7 @@ RUN go build -o /go/bin/{{.AppName}} ./cmd/.
 
 FROM alpine:3.19 AS production
 COPY --from=builder /go/bin/{{.AppName}} /go/bin/{{.AppName}}
-# COPY ./{{.AppName}}/migrations /migrations
-COPY ./{{.AppName}}/config.yml /{{.AppName}}/config.yml
+COPY /go/bin/{{.AppName}} /go/bin/{{.AppName}}
+COPY ./migrations /migrations
+COPY ./.cataystgo/ /go/bin/.catalystgo/
 ENTRYPOINT ["/go/bin/{{.AppName}}"]
