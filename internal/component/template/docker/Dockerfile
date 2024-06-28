@@ -1,12 +1,7 @@
-FROM golang:1.22 AS development
-WORKDIR /go/src/{{.Module}}
-COPY . .
-RUN go mod download
-CMD go run ./cmd/{{.AppName}}/. --config ./.catalystgo/config-development.yml
-
 FROM golang:alpine AS builder
 WORKDIR /go/src/{{.Module}}
 COPY . .
+RUN go mod download
 RUN go build -o /go/bin/{{.AppName}} ./cmd/.
 
 FROM alpine:3.19 AS production
