@@ -4,17 +4,13 @@ vars:
   # GENERAL
   GOBIN: "$(pwd)/bin"
 
-  # DB
-  DB_DSN: "user=postgres dbname={{.AppName}} password=postgres sslmode=disable"
-  MIGRATION_DIR: "./migrations"
-
   # DOCKER
   DOCKER_IMAGE: "{{.Username}}/{{.AppName}}"
 
 tasks:
   run:
     cmds:
-      - go run ./cmd/awesome-go/. --config .catalystgo/config-development.yml
+      - go run ./cmd/{{.AppName}}/. --config .catalystgo/config-local.yml
 
   mock:
     cmds:
@@ -54,7 +50,7 @@ tasks:
   generate:
     cmds:
       # Generate
-      - "{{.GOBIN}}/buf generate --template buf.gen.vendor.yaml"
+      - "{{.GOBIN}}/buf generate --template buf.gen.vendor.yaml || true" # ignore error on vendor generation (because it might be empty)
       - "{{.GOBIN}}/buf generate --template buf.gen.yaml"
       - "{{.GOBIN}}/catalystgo implement --input pkg --output internal/api"
       - go mod tidy
@@ -64,7 +60,7 @@ tasks:
   vendor:
     cmds:
       # Check if protosync.yml exists if not call protosync init
-      - if [ ! -f protosync.yml ]; then {{.GOBIN}}/protosync init; fi
+      - "{{.GOBIN}}/protosync init"
       - "{{.GOBIN}}/protosync vendor --file protosync.yml"
     deps:
       - deps
@@ -80,9 +76,9 @@ tasks:
       - GOBIN={{.GOBIN}} go install github.com/bufbuild/buf/cmd/buf@v1.33.0
 
       # CATALYSTGO
-      - GOBIN={{.GOBIN}} go install github.com/catalystgo/cli/cmd/catalystgo@v1.0.1
+      - GOBIN={{.GOBIN}} go install github.com/catalystgo/cli/cmd/catalystgo@v1.0.4
       - GOBIN={{.GOBIN}} go install github.com/catalystgo/cli/cmd/protoc-gen-catalystgo@v1.0.1
-      - GOBIN={{.GOBIN}} go install github.com/catalystgo/protosync@v0.0.2
+      - GOBIN={{.GOBIN}} go install github.com/catalystgo/protosync@v0.0.3
 
       # TOOLS
       - GOBIN={{.GOBIN}} go install github.com/pressly/goose/v3/cmd/goose@v3.20.0
@@ -92,17 +88,7 @@ tasks:
       - GOBIN={{.GOBIN}} go install github.com/golang/mock/mockgen@v1.6.0
       - GOBIN={{.GOBIN}} go install github.com/gotesttools/gotestfmt/v2/cmd/gotestfmt@v2.5.0
 
-# DOCKER COMPOSE
-
-  docker-up:
-    cmds:
-      - docker compose -f .deployment/docker-compose.yml up -d
-
-  docker-down:
-    cmds:
-      - docker compose -f .deployment/docker-compose.yml down
-
-# DOCKER
+# docker
 
   docker-build:
     cmds:

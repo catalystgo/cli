@@ -76,7 +76,7 @@ func (w *Writer) WriteFile(file string, data []byte, opts ...WriteOption) error 
 		return err
 	}
 
-	log.Infof("successfully createad %s", file)
+	log.Infof("createad %s", file)
 
 	return nil
 }

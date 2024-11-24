@@ -23,12 +23,6 @@ var (
 
 	//go:embed template/Taskfile.yml
 	taskfileContent []byte
-
-	//go:embed template/precommit/pre-commit-config.yml
-	preCommitConfig []byte
-
-	//go:embed template/precommit/commitlint.config.js
-	commitLintConfig []byte
 )
 
 var (
@@ -36,7 +30,7 @@ var (
 )
 
 //////////////////
-// GOMOD COMPONENT
+// gomod component
 //////////////////
 
 type gomodComponent struct {
@@ -64,7 +58,7 @@ func (d gomodComponent) Path() string {
 }
 
 //////////////////
-// GITIGNORE COMPONENT
+// gitignore component
 //////////////////
 
 type gitignoreComponent struct{}
@@ -86,7 +80,7 @@ func (d gitignoreComponent) Path() string {
 }
 
 //////////////////
-// REVIVE COMPONENT
+// revive component
 //////////////////
 
 type reviveComponent struct{}
@@ -108,7 +102,7 @@ func (d reviveComponent) Path() string {
 }
 
 //////////////////
-// TASKFILE COMPONENT
+// taskfile component
 //////////////////
 
 type taskfileComponent struct {
@@ -124,8 +118,7 @@ func NewTaskfileComponent(module string) Component {
 }
 
 func (t taskfileComponent) Content() ([]byte, error) {
-	// Replace the placeholder with the app name, could be done with go-template
-	// because the Taskfile has templates inside.
+	// Here we use `strings.ReplaceAll` instead of go templates because the Taskfile has templates inside.
 	file := string(taskfileContent)
 	file = strings.ReplaceAll(file, "{{.AppName}}", t.AppName)
 	file = strings.ReplaceAll(file, "{{.Username}}", t.Username)
@@ -141,52 +134,8 @@ func (t taskfileComponent) Path() string {
 	return "."
 }
 
-// ////////////////
-// PRE-COMMIT COMPONENT
-// ////////////////
-
-type preCommitComponent struct{}
-
-func NewPreCommitComponent() Component {
-	return preCommitComponent{}
-}
-
-func (p preCommitComponent) Content() ([]byte, error) {
-	return preCommitConfig, nil
-}
-
-func (p preCommitComponent) Name() string {
-	return ".pre-commit-config.yml"
-}
-
-func (p preCommitComponent) Path() string {
-	return "."
-}
-
 //////////////////
-// COMMIT-LINT CONFIG COMPONENT
-//////////////////
-
-type commitLintConfigComponent struct{}
-
-func NewcommitLintConfigComponent() Component {
-	return commitLintConfigComponent{}
-}
-
-func (c commitLintConfigComponent) Content() ([]byte, error) {
-	return commitLintConfig, nil
-}
-
-func (c commitLintConfigComponent) Name() string {
-	return "commitlint.config.js"
-}
-
-func (c commitLintConfigComponent) Path() string {
-	return "."
-}
-
-//////////////////
-// MAIN.GO COMPONENT
+// main.go component
 //////////////////
 
 type goMainComponent struct {

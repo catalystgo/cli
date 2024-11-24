@@ -22,7 +22,7 @@ type (
 )
 
 //////////////////
-// BUF COMPONENT
+// buf component
 //////////////////
 
 func NewBufComponent() Component {
@@ -42,7 +42,7 @@ func (f bufComponent) Path() string {
 }
 
 //////////////////
-// BUF GEN COMPONENT
+// buf gen component
 //////////////////
 
 func NewBufGenComponent() Component {
@@ -62,7 +62,7 @@ func (f bufGenComponent) Path() string {
 }
 
 //////////////////
-// BUF GEN VENDOR COMPONENT
+// buf gen vendor component
 //////////////////
 
 func NewBufGenVendorComponent() Component {

@@ -36,11 +36,6 @@ var initCmd = &cobra.Command{
 
 			// Docker
 			component.NewDockerComponent(module),
-			component.NewDockerComposeComponent(module),
-
-			// PreCommit
-			component.NewPreCommitComponent(),
-			component.NewcommitLintConfigComponent(),
 
 			// Lint
 			component.NewReviveComponent(),

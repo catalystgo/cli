@@ -8,18 +8,12 @@ import (
 )
 
 var (
-	//go:embed template/config/config-production.yml
-	configProductionContent []byte
-	//go:embed template/config/config-staging.yml
-	configStagingContent []byte
-	//go:embed template/config/config-development.yml
-	configDevelopmentContent []byte
+	//go:embed template/config/config.yml
+	configContent []byte
 )
 
 var (
-	configProduction  = domain.MustParseTemplate("config-production.yml", configProductionContent)
-	configStaging     = domain.MustParseTemplate("config-staging.yml", configStagingContent)
-	configDevelopment = domain.MustParseTemplate("config-development.yml", configDevelopmentContent)
+	configTemplate = domain.MustParseTemplate("config-prod.yml", configContent)
 )
 
 type configComponent struct {
@@ -43,18 +37,18 @@ func (c configComponent) Path() string {
 func NewConfigComponent(module string) []Component {
 	return []Component{
 		configComponent{
-			file:    "config-production.yml",
-			tmpl:    configProduction,
+			file:    "config-prod.yml",
+			tmpl:    configTemplate,
 			AppName: getAppNameFromModule(module),
 		},
 		configComponent{
-			file:    "config-staging.yml",
-			tmpl:    configStaging,
+			file:    "config-stage.yml",
+			tmpl:    configTemplate,
 			AppName: getAppNameFromModule(module),
 		},
 		configComponent{
-			file:    "config-development.yml",
-			tmpl:    configDevelopment,
+			file:    "config-local.yml",
+			tmpl:    configTemplate,
 			AppName: getAppNameFromModule(module),
 		},
 	}

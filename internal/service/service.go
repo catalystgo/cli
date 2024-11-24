@@ -47,9 +47,9 @@ func (s *service) Init(components []component.Component, override bool) {
 		// Override files content only if override flag is passed
 		if fileExists(name) {
 			if override {
-				log.Warnf("overriding file (%s)", name)
+				log.Warnf("override file (%s)", name)
 			} else {
-				log.Warnf("skipping file (%s) => already exist", name)
+				log.Warnf("skip file (%s) => already exist", name)
 				continue
 			}
 		}
@@ -68,7 +68,7 @@ func (s *service) Init(components []component.Component, override bool) {
 		}
 	}
 
-	log.Info("running go mod tidy")
+	log.Info("run go mod tidy")
 	err := exec.Command("go", "mod", "tidy").Run()
 	if err != nil {
 		log.Errorf("go mod tidy => %v", err)

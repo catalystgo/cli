@@ -3,6 +3,6 @@ module {{.Module}}
 go {{.Version}}
 
 require (
-  github.com/catalystgo/catalystgo v1.0.2
-  github.com/catalystgo/logger v0.0.2
+  github.com/catalystgo/catalystgo v1.0.3
+  github.com/catalystgo/logger v0.1.0
 )
