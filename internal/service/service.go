@@ -3,7 +3,6 @@ package service
 import (
 	"fmt"
 	"go/ast"
-	"os/exec"
 	"path"
 	"path/filepath"
 	"strings"
@@ -11,7 +10,8 @@ import (
 
 	"github.com/catalystgo/cli/internal/component"
 	"github.com/catalystgo/cli/internal/domain"
-	"github.com/catalystgo/logger/log"
+	"github.com/catalystgo/helpers"
+	log "github.com/catalystgo/logger/cli"
 )
 
 type Service struct{}
@@ -43,16 +43,10 @@ func (s *Service) Init(components []component.Component, override bool) {
 		}
 
 		// Write content
-		err = saveFile(name, b, &saveOpt{override: override})
+		err = helpers.SaveFile(name, b, &helpers.SaveFileOpt{Override: override})
 		if err != nil {
 			continue
 		}
-	}
-
-	log.Info("run go mod tidy")
-	err := exec.Command("go", "mod", "tidy").Run()
-	if err != nil {
-		log.Errorf("go mod tidy => %v", err)
 	}
 }
 
@@ -77,7 +71,7 @@ func (s *Service) Implement(input string, output string) error {
 	}
 
 	for file, data := range content {
-		err = saveFile(file, data, &saveOpt{override: false})
+		err = helpers.SaveFile(file, data, &helpers.SaveFileOpt{Override: false})
 		if err != nil {
 			continue
 		}

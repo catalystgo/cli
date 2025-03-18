@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/catalystgo/cli/internal/service"
-	"github.com/catalystgo/logger/log"
+	log "github.com/catalystgo/logger/cli"
 	"github.com/spf13/cobra"
 )
 

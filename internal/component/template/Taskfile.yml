@@ -74,9 +74,9 @@ tasks:
       - GOBIN={{.GOBIN}} go install github.com/bufbuild/buf/cmd/buf@v1.33.0
 
       # catalystgo
-      - GOBIN={{.GOBIN}} go install github.com/catalystgo/cli/cmd/catalystgo@v1.0.6
+      - GOBIN={{.GOBIN}} go install github.com/catalystgo/cli/cmd/catalystgo@v1.0.5
       - GOBIN={{.GOBIN}} go install github.com/catalystgo/cli/cmd/protoc-gen-catalystgo@v1.0.1
-      - GOBIN={{.GOBIN}} go install github.com/catalystgo/protosync@v0.0.4
+      - GOBIN={{.GOBIN}} go install github.com/catalystgo/protosync@v0.0.5
 
       # tools
       - GOBIN={{.GOBIN}} go install github.com/pressly/goose/v3/cmd/goose@v3.20.0

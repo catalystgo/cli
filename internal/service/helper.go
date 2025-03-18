@@ -11,7 +11,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/catalystgo/logger/log"
+	log "github.com/catalystgo/logger/cli"
 	"golang.org/x/mod/modfile"
 )
 
@@ -157,54 +157,4 @@ func getStructMethods(node *ast.File, structName string) []*ast.FuncDecl {
 		}
 	}
 	return methods
-}
-
-type saveOpt struct {
-	override bool // If true, existing files will be overridden. Default is false.
-}
-
-func saveFile(file string, data []byte, cfg *saveOpt) error {
-	if len(data) == 0 {
-		log.Warnf("no data to write in file (%s) therefore skipping", file)
-		return nil
-	}
-
-	_, err := os.Stat(file)
-	if err == nil {
-		if cfg.override {
-			log.Warnf("override file (%s)", file)
-		} else {
-			log.Warnf("skip file (%s) => already exist", file)
-			return nil
-		}
-	}
-
-	err = os.MkdirAll(filepath.Dir(file), os.ModePerm)
-	if err != nil {
-		log.Errorf("mkdir file (%s) => %v", file, err)
-		return err
-	}
-
-	f, err := os.Create(file)
-	if err != nil {
-		log.Errorf("create file (%s) => %v", file, err)
-		return err
-	}
-
-	defer func() {
-		err := f.Close()
-		if err != nil {
-			log.Errorf("close file (%s) => %v", file, err)
-		}
-	}()
-
-	_, err = f.Write(data)
-	if err != nil {
-		log.Errorf("write file (%s) => %v", file, err)
-		return err
-	}
-
-	log.Infof("createad %s", file)
-
-	return nil
 }

@@ -1,15 +1,15 @@
 # cli
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/catalystgo/cli.svg)](https://pkg.go.dev/github.com/catalystgo/cli)
+[![wakatime](https://wakatime.com/badge/user/965e81db-2a88-4564-b236-537c4a901130/project/4cfc2a67-bfe6-432b-a9b7-abf550e6be1c.svg)](https://wakatime.com/badge/user/965e81db-2a88-4564-b236-537c4a901130/project/4cfc2a67-bfe6-432b-a9b7-abf550e6be1c)
+![Build Status](https://github.com/catalystgo/cli/actions/workflows/ci.yml/badge.svg)
 [![Go Report Card](https://goreportcard.com/badge/github.com/catalystgo/cli)](https://goreportcard.com/report/github.com/catalystgo/cli)
-![License](https://img.shields.io/github/license/catalystgo/cli)
+[![codecov](https://codecov.io/gh/catalystgo/cli/graph/badge.svg?token=KN3G1NL58M)](https://codecov.io/gh/catalystgo/cli)
 
-![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/catalystgo/cli)
-![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/catalystgo/cli)
-
+[![GitHub issues](https://img.shields.io/github/issues/catalystgo/cli.svg)](https://github.com/catalystgo/cli/issues)
+[![GitHub pull requests](https://img.shields.io/github/issues-pr/catalystgo/cli.svg)](https://github.com/catalystgo/cli/pulls)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Quickstart
-
 
 Create the directory for the proto file
 
@@ -53,13 +53,6 @@ message AuthenticateResponse {
 }
 ```
 
-## Future milestones 💎
-
-### Priority (high)
+## Features 🎯
 
 - [ ] Write tests for service.Service methods in generated code
-- [ ] Add support to many services in a single proto file/directory
-
-### Priority (medium)
-
-- [ ] Add github actions to run tests, lint, build/push docker images

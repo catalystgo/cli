@@ -24,3 +24,5 @@ go.work
 
 bin/
 vendor.proto/
+coverage.txt
+vendor/
