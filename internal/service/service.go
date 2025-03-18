@@ -14,31 +14,12 @@ import (
 	"github.com/catalystgo/logger/log"
 )
 
-var _ Service = &service{}
+type Service struct{}
 
-type (
-	Service interface {
-		Init(components []component.Component, override bool)
-		Implement(input string, output string) error
-	}
-
-	WriterSrv interface {
-		WriteFile(file string, data []byte, opts ...WriteOption) error
-	}
-)
-
-type service struct {
-	w WriterSrv
-}
-
-func New() Service {
-	return &service{
-		w: NewWriter(),
-	}
-}
+func New() *Service { return &Service{} }
 
 // Init implements CommandService.
-func (s *service) Init(components []component.Component, override bool) {
+func (s *Service) Init(components []component.Component, override bool) {
 	for _, c := range components {
 		name := filepath.Join(c.Path(), c.Name())
 
@@ -62,7 +43,7 @@ func (s *service) Init(components []component.Component, override bool) {
 		}
 
 		// Write content
-		err = s.w.WriteFile(name, b, WithOverride(override))
+		err = saveFile(name, b, &saveOpt{override: override})
 		if err != nil {
 			continue
 		}
@@ -75,7 +56,7 @@ func (s *service) Init(components []component.Component, override bool) {
 	}
 }
 
-func (s *service) Implement(input string, output string) error {
+func (s *Service) Implement(input string, output string) error {
 	files, err := getGrpcGoFiles(input)
 	if err != nil {
 		return err
@@ -96,7 +77,7 @@ func (s *service) Implement(input string, output string) error {
 	}
 
 	for file, data := range content {
-		err = s.w.WriteFile(file, data)
+		err = saveFile(file, data, &saveOpt{override: false})
 		if err != nil {
 			continue
 		}
@@ -105,7 +86,7 @@ func (s *service) Implement(input string, output string) error {
 	return nil
 }
 
-func (s *service) implement(nodes map[string]*ast.File, input string, output string) (map[string][]byte, error) {
+func (s *Service) implement(nodes map[string]*ast.File, input string, output string) (map[string][]byte, error) {
 	module, err := getCurrentModule()
 	if err != nil {
 		return nil, err
@@ -175,7 +156,7 @@ func (s *service) implement(nodes map[string]*ast.File, input string, output str
 	return files, nil
 }
 
-func (s *service) buildContructor(module string, file string, packageName string, serviceName string) ([]byte, error) {
+func (s *Service) buildContructor(module string, file string, packageName string, serviceName string) ([]byte, error) {
 	// Get the service name without the unimplemented prefix and suffix
 	serviceName = strings.TrimSuffix(serviceName, unimplementedStructSuffix)
 	serviceName = strings.TrimPrefix(serviceName, unimplementedStructPrefix)
@@ -190,7 +171,7 @@ func (s *service) buildContructor(module string, file string, packageName string
 	return domain.ExecuteTemplate(serviceTemplate, data)
 }
 
-func (s *service) buildStructMethod(module string, file string, packageName string, method *ast.FuncDecl) ([]byte, error) {
+func (s *Service) buildStructMethod(module string, file string, packageName string, method *ast.FuncDecl) ([]byte, error) {
 	var (
 		tmpl *template.Template
 		data = methodTemplateData{
@@ -202,8 +183,8 @@ func (s *service) buildStructMethod(module string, file string, packageName stri
 	)
 
 	// Get the method type
-	methodType := getMethodType(method)
-	switch methodType {
+	mt := getMethodType(method)
+	switch mt {
 	case unaryMethod:
 		tmpl = methodUnaryTemplate
 		data.Request = method.Type.Params.List[1].Type.(*ast.StarExpr).X.(*ast.Ident).Name   // request
@@ -212,11 +193,11 @@ func (s *service) buildStructMethod(module string, file string, packageName stri
 		tmpl = methodServerStreamTemplate
 		data.Request = method.Type.Params.List[0].Type.(*ast.StarExpr).X.(*ast.Ident).Name // request
 		data.Stream = method.Type.Params.List[1].Type.(*ast.Ident).Name                    // stream
-	case bidectionalOrClientStreamMethod:
-		tmpl = methodBidectionalOrClientTemplate
+	case bidirectionalOrClientStreamMethod:
+		tmpl = methodBidirectionalOrClientStreamTemplate
 		data.Stream = method.Type.Params.List[0].Type.(*ast.Ident).Name // stream
 	default:
-		log.Warnf("unsupported method type (%s) in file (%s)", methodType, file)
+		log.Warnf("unsupported method type (%s) in file (%s)", mt, file)
 		return nil, nil
 	}
 

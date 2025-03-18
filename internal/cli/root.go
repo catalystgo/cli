@@ -24,7 +24,7 @@ var srv = service.New()
 
 var rootCmd = &cobra.Command{
 	Use:   "catalystgo [command]",
-	Short: "Catalystgo framework CLI tool for code generation",
+	Short: "Catalystgo CLI tool for code generation",
 	PersistentPreRun: func(_ *cobra.Command, _ []string) {
 		if verbose {
 			log.SetLevel(log.LevelDebug)

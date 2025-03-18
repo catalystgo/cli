@@ -16,15 +16,15 @@ var (
 	//go:embed template/implement/method_server_stream.go.tmpl
 	methodServerStreamContent []byte
 
-	//go:embed template/implement/method_bidectional_or_client_stream.go.tmpl
-	methodBidectionalOrClientStreamContent []byte
+	//go:embed template/implement/method_bidirectional_or_client_stream.go.tmpl
+	methodBidirectionalOrClientStreamContent []byte
 )
 
 var (
-	serviceTemplate                   = domain.MustParseTemplate("service.go", serviceContent)
-	methodUnaryTemplate               = domain.MustParseTemplate("method_unary.go", methodUnaryContent)
-	methodServerStreamTemplate        = domain.MustParseTemplate("method_server_stream.go", methodServerStreamContent)
-	methodBidectionalOrClientTemplate = domain.MustParseTemplate("method_bidectional_or_client_stream.go", methodBidectionalOrClientStreamContent)
+	serviceTemplate                           = domain.MustParseTemplate("service.go", serviceContent)
+	methodUnaryTemplate                       = domain.MustParseTemplate("method_unary.go", methodUnaryContent)
+	methodServerStreamTemplate                = domain.MustParseTemplate("method_server_stream.go", methodServerStreamContent)
+	methodBidirectionalOrClientStreamTemplate = domain.MustParseTemplate("method_bidirectional_or_client_stream.go", methodBidirectionalOrClientStreamContent)
 )
 
 type (

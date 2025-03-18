@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	gprcFileSuffix = "_grpc.pb.go"
+	grpcFileSuffix = "_grpc.pb.go"
 )
 
 const (
@@ -17,10 +17,10 @@ const (
 type methodType string
 
 const (
-	unknownMethod                   methodType = "unknown"
-	unaryMethod                     methodType = "unary"
-	serverStreamMethod              methodType = "serverStream"
-	bidectionalOrClientStreamMethod methodType = "bidectionalOrClientStream"
+	unknownMethod                     methodType = "unknown"
+	unaryMethod                       methodType = "unary"
+	serverStreamMethod                methodType = "serverStream"
+	bidirectionalOrClientStreamMethod methodType = "bidirectionalOrClientStream"
 )
 
 func getMethodType(method *ast.FuncDecl) methodType {
@@ -40,7 +40,7 @@ func getMethodType(method *ast.FuncDecl) methodType {
 
 	// Example: func (i *Implementation) MethodName(stream desc.ServiceName_MethodNameServer) error
 	case paramsCount == 1 && resultsCount == 1:
-		return bidectionalOrClientStreamMethod
+		return bidirectionalOrClientStreamMethod
 	default:
 		return unknownMethod
 	}

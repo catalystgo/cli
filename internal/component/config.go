@@ -36,18 +36,19 @@ func (c configComponent) Path() string {
 
 func NewConfigComponent(module string) []Component {
 	return []Component{
+		// TODO: enable when we have stage and prod config
+		//configComponent{
+		//	file:    "config-prod.yml",
+		//	tmpl:    configTemplate,
+		//	AppName: getAppNameFromModule(module),
+		//},
+		//configComponent{
+		//	file:    "config-stage.yml",
+		//	tmpl:    configTemplate,
+		//	AppName: getAppNameFromModule(module),
+		//},
 		configComponent{
-			file:    "config-prod.yml",
-			tmpl:    configTemplate,
-			AppName: getAppNameFromModule(module),
-		},
-		configComponent{
-			file:    "config-stage.yml",
-			tmpl:    configTemplate,
-			AppName: getAppNameFromModule(module),
-		},
-		configComponent{
-			file:    "config-local.yml",
+			file:    "config.yml",
 			tmpl:    configTemplate,
 			AppName: getAppNameFromModule(module),
 		},

@@ -1,8 +1,7 @@
 package cli
 
 import (
-	"log"
-
+	"github.com/catalystgo/logger/log"
 	"github.com/spf13/cobra"
 )
 
