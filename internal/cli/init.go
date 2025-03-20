@@ -14,6 +14,7 @@ var initCmd = &cobra.Command{
 	Short:   "Initialize a new project",
 	Long:    "Initialize a new project",
 	Example: "catalystgo init github.com/user_name/project_name",
+	Aliases: []string{"i"},
 	Args: func(_ *cobra.Command, args []string) error {
 		if len(args) == 1 {
 			return nil
