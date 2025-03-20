@@ -48,7 +48,7 @@ docker pull catalystgo/cli:latest
 1) Initialize the project
 
     ```bash
-    catalystgo init github.com/username/repo
+    catalystgo init github.com/catalystgo/awesome-app
     ```
 
 2) Create proto file
@@ -70,7 +70,7 @@ docker pull catalystgo/cli:latest
     import "protoc-gen-openapiv2/options/annotations.proto";
     import "protoc-gen-openapiv2/options/openapiv2.proto";
     
-    option go_package = "github.com/username/repo/pkg/example";
+    option go_package = "github.com/catalystgo/awesome-app/pkg/user";
     
     service UserService {
       rpc Authenticate(AuthenticateRequest) returns (AuthenticateResponse) {
@@ -103,13 +103,15 @@ docker pull catalystgo/cli:latest
 5) Modify the content of `internal/api/user/authenticate.go` to
 
    ```go
+   package user
+   
    import (
       "context"
-      desc "github.com/escalopa/awesome-app/pkg/example"
+      desc "github.com/catalystgo/awesome-app/pkg/user"
       "google.golang.org/grpc/codes"
       "google.golang.org/grpc/status"
    )
-     
+
    func (i *Implementation) Authenticate(ctx context.Context, req *desc.AuthenticateRequest) (*desc.AuthenticateResponse, error) {
        if req.GetUsername() == "admin" && req.GetPassword() == "admin" {
            return &desc.AuthenticateResponse{Token: "admin-token"}, nil
@@ -121,17 +123,30 @@ docker pull catalystgo/cli:latest
 6) Modify the content of `cmd/awesome-app/main.go` to be
 
      ```go
+    package main
+    
+    import (
+      "context"
+    
+      "github.com/catalystgo/catalystgo"
+      "github.com/catalystgo/logger/logger"
+      "github.com/catalystgo/awesome-app/internal/api/user"
+    )
+    
     func main() {
-        app, err := catalystgo.New()
-   
-        ... 
-   
-        srv := example.NewUserService()
-   
-        ...
-   
-        err := app.Run(srv)
-   }
+      ctx := context.Background()
+    
+      app, err := catalystgo.New()
+      if err != nil {
+        logger.Fatalf(ctx, "create app: %v", err)
+      }
+      
+      srv := user.NewUserService()
+    
+      if err := app.Run(srv); err != nil {
+        logger.Fatalf(ctx, "run app: %v", err)
+      }
+    }
     ```
 
 7) Run the app
@@ -143,12 +158,14 @@ docker pull catalystgo/cli:latest
 8) Test the app
     ```bash
     # using http
-    curl -X POST -d '{"username": "admin", "password": "admin"}' http://localhost:8080/user/authenticate
+    curl -s -X POST -d '{"username": "admin", "password": "admin"}' http://localhost:7000/user/authenticate | jq
    
     # using grpc
-    grpcurl -plaintext -d '{"username": "admin", "password": "admin"}' localhost:8080 user_pb.UserService/Authenticate
+    grpcurl -plaintext -d '{"username": "admin", "password": "admin"}' localhost:8000 user_pb.UserService/Authenticate | jq
     ```
 
-## Features 🎯
+Congratz!!! You have built a golang app in seconds 🥳
 
-- [ ] Write tests for service.Service methods in generated code
+## Contributing 🤝
+
+![Alt](https://repobeats.axiom.co/api/embed/e373563a2553ccafa09a9dc1a6e18d31c761fc4b.svg "Repobeats analytics image")
